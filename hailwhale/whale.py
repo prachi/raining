@@ -20,6 +20,7 @@ _added_subdimensions = collections.defaultdict(list)
 # set method as increment to alter databsse
 def _increment(*args, **kwargs):
     kwargs['method'] = 'incr'
+    print "hello"
     return _store(*args, **kwargs)
 
 # main function for doing entry in datanbase ( hierarchchly and temporarly )
@@ -528,10 +529,9 @@ class Whale(object):
         return cls.count_now([pk_base, decision, option], *args, **kwargs)
 
     @classmethod
-    def count_now(cls, pk, dimensions='_', metrics=None, at=False):
+    def count_now(cls, pk, dimensions='_', metrics=None, at=False, toto=False):
         """ Immediately count a hit, as opposed to logging it into Hail"""
         periods = DEFAULT_PERIODS
-
         if isinstance(at, basestring):
             try:
                 if ':' in at:
@@ -561,7 +561,6 @@ class Whale(object):
                         generate_increments(metrics, periods, at)):
             if i == 0:
                 continue
-
             _increment(pipe, pkk, dimension, metric, period, dt, i)
         pipe.execute()
 
@@ -821,6 +820,7 @@ def generate_increments(metrics, periods=False, at=False):
     periods = periods or DEFAULT_PERIODS
     observations = set()
     at = at or cls.now()
+    print at
     for period in periods:
         dt = period.flatten_str(at)
         if not dt:
@@ -829,4 +829,5 @@ def generate_increments(metrics, periods=False, at=False):
     rr = [(period, dt, metric, incr_by)
             for (period, dt) in observations
             for metric, incr_by in metrics.items()]
+    print rr
     return rr

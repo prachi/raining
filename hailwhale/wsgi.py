@@ -49,7 +49,8 @@ def default_params():
     return dict([
             g_tup('pk', '_', False),
             g_tup('dimensions', ['_'], False),
-            g_tup('metrics', dict(hits=1), False)])
+            g_tup('metrics', dict(hits=1), False),
+            g_tup('at', '_', False)])
 
 
 @route('/count')
@@ -70,15 +71,17 @@ def reset():
 @route('/count_now')
 def count_now():
     whale = Whale()
-    at = g('at', False)
+    vals = default_params()
+    at = vals.get("at")#g('at', False)
     tzoffset = None
     if not at:
         at = times.now()
     else:
         from dateutil.parser import parse
-        at = parse(g('at'))
-        at = at.replace(tzinfo=None)
-    val = whale.count_now(at=at, **default_params())
+        at = parse(at)
+        #at = at.replace(tzinfo=None)
+    print at
+    val = whale.count_now(at= at, pk=vals.get("pk"), metrics=vals.get("metrics"), dimensions=vals.get("dimensions"))
     return 'OK'
 
 @route('/update_count_to')
@@ -168,6 +171,7 @@ def tracker():
     whale = Whale()
     hail = Hail()
     val = whale.count_now(at=times.now(), **params)
+    #val = whale.count_now(**params)
     uid = g('uid')
     if not uid or uid == '_new':
         default = random.randrange(10**6,10**9)
