@@ -166,7 +166,7 @@ class Hail(object):
                 #at = datetime.datetime.fromtimestamp(float(t))
                 return (pk, dimensions, metrics, at)
             except Exception as e: 
-                print (e)
+                print e
                 return False 
 
         keys_to_update = map(get_keys_from_json, keys_from_hail)

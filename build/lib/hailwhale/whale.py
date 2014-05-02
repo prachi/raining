@@ -20,6 +20,7 @@ _added_subdimensions = collections.defaultdict(list)
 # set method as increment to alter databsse
 def _increment(*args, **kwargs):
     kwargs['method'] = 'incr'
+    print "hello"
     return _store(*args, **kwargs)
 
 # main function for doing entry in datanbase ( hierarchchly and temporarly )
@@ -208,15 +209,15 @@ class Whale(object):
                         tzs = convert(points.keys())
                         combo[dim][met] = dict(zip(tzs, points.items()))
                     if isinstance(points, list):
-                        tzs = convert(map(lambda x, y: x, points))
-                        combo[dim][met] = zip(tzs, map(lambda x, y: y, points))
+                        tzs = convert(map(lambda (x,y): x, points))
+                        combo[dim][met] = zip(tzs, map(lambda (x,y): y, points))
 
         # Begin Sorting and trimming fun
 
         # Get the values from either a dict or a list
         def _vals(pts):
             if isinstance(pts, list):
-                return map(lambda x, y: y, pts)
+                return map(lambda (x,y): y, pts)
             elif isinstance(pts, dict):
                 return pts.values()
             return []
@@ -492,13 +493,13 @@ class Whale(object):
                 if not ps[this_p].flatten(dt):
                     r.hdel(k, dt)
                     deleted += 1
-                    print ('Flatten invalid', dt, ps[this_p])
+                    print 'Flatten invalid', dt, ps[this_p]
             # Cleanup empty key
             if (len(val) - deleted) == 0:
-                print ('Key empty, deleting --', k)
+                print 'Key empty, deleting --', k
                 r.delete(k)
             elif deleted > 0:
-                print ('Deleted', deleted, 'old keys from', k)
+                print 'Deleted', deleted, 'old keys from', k
 
     @classmethod
     def get_subdimensions(cls, pk, dimension='_'):
@@ -537,8 +538,8 @@ class Whale(object):
                     at = datetime.strptime(at, '%c')
                 else:
                     at = float(at)
-            except (Exception, e):
-                print (e)
+            except Exception, e:
+                print e
         at = at or cls.now()
         if not metrics:
             metrics = ['hits']
@@ -819,14 +820,15 @@ def generate_increments(metrics, periods=False, at=False):
     periods = periods or DEFAULT_PERIODS
     observations = set()
     at = at or cls.now()
-    
+    print at
     for period in periods:
         dt = period.flatten_str(at)
-
+        print dt
         if not dt:
             continue
         observations.add((period, dt))
     rr = [(period, dt, metric, incr_by)
             for (period, dt) in observations
             for metric, incr_by in metrics.items()]
+    print rr
     return rr

@@ -184,7 +184,7 @@ class whale_cache(object):
 
     def __call__(self, *args, **kwargs):
         from whale import Whale
-        import periods
+        from periods import *
         if len(args) and args[0] == Whale or issubclass(args[0], Whale):
             args = args[1:]
         clear_cache = kwargs.pop('unmemoize', False)
