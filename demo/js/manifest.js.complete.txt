@@ -1,0 +1,4 @@
+jquery.min.js
+d3.js
+nvd3.js
+hailwhale.js
