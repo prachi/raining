@@ -158,6 +158,7 @@ class Whale(object):
         metrics = metrics or ['hits']
         only_metric = False
         tzoffset = kwargs.pop('tzoffset', 0.0)
+        at = kwargs.pop('at', None)
         if isinstance(metrics, basestring):
             metrics = [metrics]
         if isinstance(metrics, dict):
@@ -184,10 +185,10 @@ class Whale(object):
             if not bottom:
                 scalars.append(met)
             else:
-                ratios[met] = cls.ratio_plotpoints(pk, top, bottom, dimensions, **kwargs)
+                ratios[met] = cls.ratio_plotpoints(pk, top, bottom, dimensions, at, **kwargs)
 
         # Now get the scalars
-        combo = cls.scalar_plotpoints(pk, dimensions, scalars, **kwargs)
+        combo = cls.scalar_plotpoints(pk, dimensions, scalars, at, **kwargs)
         # and merge them
         for dim, mets in combo.items():
             for ratio, points in ratios.items():
@@ -208,8 +209,8 @@ class Whale(object):
                         tzs = convert(points.keys())
                         combo[dim][met] = dict(zip(tzs, points.items()))
                     if isinstance(points, list):
-                        tzs = convert(map(lambda x, y: x, points))
-                        combo[dim][met] = zip(tzs, map(lambda x, y: y, points))
+                        tzs = convert(map(lambda (x, y): x, points))
+                        combo[dim][met] = zip(tzs, map(lambda (x, y): y, points))
 
         # Begin Sorting and trimming fun
 
@@ -244,14 +245,17 @@ class Whale(object):
         return cls.plotpoints(*args, **kwargs)
 
     @classmethod
-    def scalar_plotpoints(cls, pk, dimensions=None, metrics=None,
-            depth=0, period=None, flot_time=False, points_type=OrderedDict,at=None):
+    def scalar_plotpoints(cls, pk, dimensions=None, metrics=None, at=None,
+            depth=0, period=None, flot_time=False, points_type=OrderedDict):
         metrics = metrics or ['hits']
+        at = at or times.now()
         if isinstance(metrics, basestring):
             metrics = [metrics]
-        p_obj, ats, tzoffset = Period.get_days(period)
+        p_obj, ats, tzoffset = Period.get_days(period,at)
         p_s = str(p_obj)
-        dts = list(p_obj.datetimes_strs())
+
+        dts = list(p_obj.datetimes_strs(end=Period.parse_dt_str(at)))
+
         sparse = _retrieve(cls.whale_driver(), pk, dimensions, metrics, period=p_obj)
         nonsparse = defaultdict(dict)
         if flot_time:
@@ -311,13 +315,13 @@ class Whale(object):
 
     @classmethod
     def ratio_plotpoints(cls, pk, numerator_metric, denomenator_metric='hits',
-            dimensions=None, depth=0, period=None, flot_time=False,
-            points_type=OrderedDict,at=None):
+            dimensions=None, at=None, depth=0, period=None, flot_time=False,
+            points_type=OrderedDict):
         if flot_time:
             points_type = list
         top, bot = numerator_metric, denomenator_metric
         pps = cls.scalar_plotpoints(pk, dimensions, [top, bot], depth=depth, period=period,
-            flot_time=flot_time, points_type=points_type)
+            flot_time=flot_time, points_type=points_type, at=at)
         formula = '%s/%s' % (top, bot)
 
         # The function that makes the ratios
@@ -356,16 +360,16 @@ class Whale(object):
         if not ats and not index:
             index = -1
         if isinstance(index, int):
-            pps = cls.plotpoints(pk, dimension, metric, period=period, points_type=list)
+            pps = cls.plotpoints(pk, dimension, metric, period=period, points_type=list, at=at)
             return pps[dimension][metric][index][1]
         else:
             if not bot:
-                pps = cls.plotpoints(pk, dimension, metric, period=period)
+                pps = cls.plotpoints(pk, dimension, metric, period=period, at=at)
                 ppsm = pps[dimension][metric]
                 return sum([ppsm[dt] for dt in ats if dt in ppsm])
             else:
-                top_pps = cls.plotpoints(pk, dimension, top, period=period)
-                bot_pps = cls.plotpoints(pk, dimension, bot, period=period)
+                top_pps = cls.plotpoints(pk, dimension, top, period=period, at=at)
+                bot_pps = cls.plotpoints(pk, dimension, bot, period=period, at=at)
                 top_ppsm = top_pps[dimension][top]
                 bot_ppsm = bot_pps[dimension][bot]
                 top_tot = sum([top_ppsm[dt] for dt in ats if dt in top_ppsm])
@@ -451,7 +455,7 @@ class Whale(object):
         d = {}
         for p in periods:
             period, ats, tzoffset = Period.get_days(p,at)
-            p_data = cls.plotpoints(pk, dimensions, metrics, period=p)
+            p_data = cls.plotpoints(pk, dimensions, metrics, period=p,at=at)
             p_totals = dict()
             for dim in p_data.keys():
                 p_totals[dim] = dict()

@@ -127,7 +127,6 @@ def plotpoints():
     params['limit'] = g('limit', 10)
     params['tzoffset'] = g('tzoffset', 0.0)
     params['flot_time'] = True
-    params['at'] = None
     return whale.plotpoints(**params)
 
 
