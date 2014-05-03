@@ -216,7 +216,7 @@ class Period(object):
         if type(dtf) in (str, unicode):
             dtf = self.parse_dt_str(dtf)
         dts = list(self.datetimes(end=dtf))
-        print dts
+        s
         flat = len(dts) and dts[-1] or False
         return flat
 

@@ -540,6 +540,7 @@ class Whale(object):
             except (Exception, e):
                 print (e)
         at = at or cls.now()
+        print at
         if not metrics:
             metrics = ['hits']
         if type(metrics) == list:

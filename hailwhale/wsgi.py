@@ -78,9 +78,8 @@ def count_now():
         at = times.now()
     else:
         from dateutil.parser import parse
-        at = parse(unicode(at))
-        #at = at.replace(tzinfo=None)
-    print(at)
+        at = parse(at)
+        print at
     val = whale.count_now(at= at, pk=vals.get("pk"), metrics=vals.get("metrics"), dimensions=vals.get("dimensions"))
     return 'OK'
 

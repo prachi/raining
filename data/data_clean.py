@@ -1,5 +1,6 @@
 import json
 from urllib2 import urlopen
+import os
 
 def getplace(lat, lon):
     url = "http://maps.googleapis.com/maps/api/geocode/json?"
@@ -20,23 +21,31 @@ def getplace(lat, lon):
     else:
 		return None, None
 
-f = open('00.json.1','w')
-with open('00.json') as fp:
+filenames = os.listdir(os.getcwd())
+open_files = map(open, filenames)
+f = open('data.json','w')
+# do stuff
+
+for fp in open_files:
+#f.close()
+#with open('10.json') as fp:
 	for line in fp:
-		data = json.loads(line)
+ 		data = json.loads(line)
 		if (data.has_key("created_at") & data.has_key("coordinates") & (data.get("lang") == "en") & (data.get("coordinates") != None)):
-			#if data.get("entities").get("hashtags") != []:
+				#if data.get("entities").get("hashtags") != []:
 			tags = data.get("entities").get("hashtags")
 			for tag in tags:
 				txt = tag.get("text")
 				place = data.get("coordinates").get("coordinates")
 				town, country = getplace(place[1], place[0])
-				at = {"created_at": data.get("created_at")}
-				dim = {	country: {town: txt} }
-				met = {	"favorite_count": data.get("favorite_count"),
-						"retweet_count": data.get("retweet_count") }
+				at = {"at": data.get("created_at")}
+				dim = {"dim":{	country: {town: txt} }}
+				met = {"met":{	"favorite_count": data.get("favorite_count"),
+							"retweet_count": data.get("retweet_count") }}
+
 				f.write(json.dumps(at) + "\n")
 				f.write(json.dumps(dim) + "\n")
 				f.write(json.dumps(met) + "\n")
+	fp.close()
 
 f.close()
