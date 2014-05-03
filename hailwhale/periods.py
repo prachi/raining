@@ -82,38 +82,39 @@ class Period(object):
     @classmethod
     def get_days(cls, period, at=None, tzoffset=None):
         ats = False
+        at = at or times.now()
         period = str(period)
         if '|' in period:
             period, tzoffset = period.split('|')
         if period == 'ytd':
             period = 'year'
             period = cls.get(period)
-            start = convert(times.now(), tzoffset).replace(month=1,
+            start = convert(at, tzoffset).replace(month=1,
                     day=1,hour=0,minute=0,second=0, microsecond=0)
             ats = period.datetimes_strs(start=start, tzoffset=tzoffset)
         if period == 'mtd':
             period = 'thirty'
             period = cls.get(period)
-            start = convert(times.now(), tzoffset).replace(day=1, hour=0,
+            start = convert(at, tzoffset).replace(day=1, hour=0,
                     minute=0, second=0, microsecond=0)
             ats = period.datetimes_strs(start=start, tzoffset=tzoffset)
         if period == 'wtd':
             period = 'thirty'
             period = cls.get(period)
-            start = convert(times.now(), tzoffset).replace(hour=0, minute=0,
+            start = convert(at, tzoffset).replace(hour=0, minute=0,
                     second=0, microsecond=0)
             start = start - timedelta(start.weekday() + 2)
             ats = period.datetimes_strs(start=start, tzoffset=tzoffset)
         if period in ['today', 'hours']:
             period = 'thirty'
             period = cls.get(period)
-            start = convert(times.now(), tzoffset).replace(hour=0, minute=0,
+            start = convert(at, tzoffset).replace(hour=0, minute=0,
                     second=0, microsecond=0)
             ats = period.datetimes_strs(start=start, tzoffset=tzoffset)
         if period == 'yesterday':
             period = 'thirty'
             period = cls.get(period)
-            end = convert(times.now(), tzoffset).replace(hour=0, minute=0,
+            end = convert(at, tzoffset).replace(hour=0, minute=0,
                     second=0, microsecond=0)
             start = end - timedelta(1)
             end = end - timedelta(seconds=1)
@@ -121,7 +122,7 @@ class Period(object):
         if period == 'seven':
             period = 'thirty'
             period = cls.get(period)
-            start = convert(times.now(), tzoffset).replace(hour=0, minute=0,
+            start = convert(at, tzoffset).replace(hour=0, minute=0,
                     second=0, microsecond=0) - timedelta(7)
             ats = period.datetimes_strs(start=start, tzoffset=tzoffset)
         if '-' in str(period):
@@ -133,7 +134,6 @@ class Period(object):
             start = datetime.strptime(start_s, '%m/%d/%Y').replace(hour=0, minute=0, second=0, microsecond=0)
             ats = period.datetimes_strs(start=start, end=end, tzoffset=tzoffset)
 
-
         period = cls.get(period)
         if not ats and not at:
             ats = period.datetimes_strs(tzoffset=tzoffset)
@@ -143,6 +143,7 @@ class Period(object):
 
     # initial starting point on the basis of chosen period
     def start(self, at):
+        at = at or times.now()
         interval, length = self.getUnits()
         dt= (at -
                 timedelta(seconds=length))
@@ -215,6 +216,7 @@ class Period(object):
             dtf = times.now()
         if type(dtf) in (str, unicode):
             dtf = self.parse_dt_str(dtf)
+
         dts = list(self.datetimes(end=dtf))
         flat = len(dts) and dts[-1] or False
         return flat
@@ -241,6 +243,7 @@ class Period(object):
             Period.all_sizes()))
 
     @staticmethod
+    # return period dictionary according to passes argument (periods)
     def get(name=None):
         if isinstance(name, Period):
             return name

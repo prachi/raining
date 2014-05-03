@@ -216,7 +216,7 @@ class Whale(object):
         # Get the values from either a dict or a list
         def _vals(pts):
             if isinstance(pts, list):
-                return map(lambda x, y: y, pts)
+                return map(lambda (x, y): y, pts)
             elif isinstance(pts, dict):
                 return pts.values()
             return []
@@ -245,7 +245,7 @@ class Whale(object):
 
     @classmethod
     def scalar_plotpoints(cls, pk, dimensions=None, metrics=None,
-            depth=0, period=None, flot_time=False, points_type=OrderedDict):
+            depth=0, period=None, flot_time=False, points_type=OrderedDict,at=None):
         metrics = metrics or ['hits']
         if isinstance(metrics, basestring):
             metrics = [metrics]
@@ -312,7 +312,7 @@ class Whale(object):
     @classmethod
     def ratio_plotpoints(cls, pk, numerator_metric, denomenator_metric='hits',
             dimensions=None, depth=0, period=None, flot_time=False,
-            points_type=OrderedDict):
+            points_type=OrderedDict,at=None):
         if flot_time:
             points_type = list
         top, bot = numerator_metric, denomenator_metric
@@ -434,7 +434,7 @@ class Whale(object):
 
     @classmethod
     # return all values in dictionary form for every passed period
-    def totals(cls, pk, dimensions=None, metrics=None, periods=None):
+    def totals(cls, pk, dimensions=None, metrics=None, periods=None, at=None):
         if not periods:
             periods = DEFAULT_PERIODS
         if not isinstance(periods, list):
@@ -450,7 +450,7 @@ class Whale(object):
                 metrics += metric.split('/')
         d = {}
         for p in periods:
-            period, ats, tzoffset = Period.get_days(p)
+            period, ats, tzoffset = Period.get_days(p,at)
             p_data = cls.plotpoints(pk, dimensions, metrics, period=p)
             p_totals = dict()
             for dim in p_data.keys():
@@ -540,7 +540,6 @@ class Whale(object):
             except (Exception, e):
                 print (e)
         at = at or cls.now()
-        print at
         if not metrics:
             metrics = ['hits']
         if type(metrics) == list:

@@ -79,7 +79,6 @@ def count_now():
     else:
         from dateutil.parser import parse
         at = parse(at)
-        print at
     val = whale.count_now(at= at, pk=vals.get("pk"), metrics=vals.get("metrics"), dimensions=vals.get("dimensions"))
     return 'OK'
 
@@ -128,6 +127,7 @@ def plotpoints():
     params['limit'] = g('limit', 10)
     params['tzoffset'] = g('tzoffset', 0.0)
     params['flot_time'] = True
+    params['at'] = None
     return whale.plotpoints(**params)
 
 
