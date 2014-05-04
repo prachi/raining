@@ -26,9 +26,9 @@ open_files = map(open, filenames)
 f = open('data.json','w')
 # do stuff
 
-for fp in open_files:
+#for fp in open_files:
 #f.close()
-#with open('10.json') as fp:
+with open('10.json') as fp:
 	for line in fp:
  		data = json.loads(line)
 		if (data.has_key("created_at") & data.has_key("coordinates") & (data.get("lang") == "en") & (data.get("coordinates") != None)):
@@ -40,8 +40,7 @@ for fp in open_files:
 				town, country = getplace(place[1], place[0])
 				at = {"at": data.get("created_at")}
 				dim = {"dim":{	country: {town: txt} }}
-				met = {"met":{	"favorite_count": data.get("favorite_count"),
-							"retweet_count": data.get("retweet_count") }}
+				met = {"met":{"hits":1}}
 
 				f.write(json.dumps(at) + "\n")
 				f.write(json.dumps(dim) + "\n")

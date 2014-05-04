@@ -159,6 +159,7 @@ class Whale(object):
         only_metric = False
         tzoffset = kwargs.pop('tzoffset', 0.0)
         at = kwargs.pop('at', None)
+
         if isinstance(metrics, basestring):
             metrics = [metrics]
         if isinstance(metrics, dict):
@@ -253,7 +254,6 @@ class Whale(object):
             metrics = [metrics]
         p_obj, ats, tzoffset = Period.get_days(period,at)
         p_s = str(p_obj)
-
         dts = list(p_obj.datetimes_strs(end=Period.parse_dt_str(at)))
 
         sparse = _retrieve(cls.whale_driver(), pk, dimensions, metrics, period=p_obj)
@@ -306,10 +306,11 @@ class Whale(object):
                         last_value = value
                     nonsparse[dim][met].append([dt_t, float(value)])
                 nonsparse[dim][met] = points_type(nonsparse[dim][met])
+
         if depth > 0:
             for sub in cls.get_subdimensions(pk, dimensions):
                 nonsparse = dict(nonsparse.items() +
-                    cls.plotpoints(pk, sub, metrics, depth=depth - 1, period=period,
+                    cls.plotpoints(pk, sub, metrics, at=at, depth=depth - 1, period=period,
                         flot_time=flot_time, points_type=points_type).items())
         return nonsparse
 
@@ -512,6 +513,7 @@ class Whale(object):
             dimension = [dimension]
         set_members = cls.whale_driver().smembers(keyify('subdimensions', pk,
                     dimension))
+        print keyify('subdimensions', pk, dimension)
         subdimensions = []
         for s in set_members:
             loaded = try_loads(s)

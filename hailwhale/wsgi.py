@@ -52,7 +52,6 @@ def default_params():
             g_tup('metrics', dict(hits=1), False),
             g_tup('at', '_', False)])
 
-
 @route('/count')
 def count():
     hail = Hail()
@@ -113,6 +112,7 @@ def flush_hail():
 def totals():
     whale = Whale()
     params = default_params()
+    params['periods'] = g('periods', None)
     if type(params['metrics']) == dict:
         params['metrics'] = params['metrics'].keys()
     return whale.totals(**params)
@@ -121,12 +121,12 @@ def totals():
 def plotpoints():
     whale = Whale()
     params = default_params()
-    params['depth'] = g('depth', 0)
+    params['depth'] = g('depth', 2)
     params['period'] = g('period', None)
     params['sort'] = g('sort', None)
     params['limit'] = g('limit', 10)
     params['tzoffset'] = g('tzoffset', 0.0)
-    params['flot_time'] = True
+    params['flot_time'] = False
     return whale.plotpoints(**params)
 
 

@@ -145,10 +145,7 @@ class Period(object):
     def start(self, at):
         at = at or times.now()
         interval, length = self.getUnits()
-        print "hello" 
-        print at
         dt= (at - timedelta(seconds=length))
-        print dt
         if interval < 60:
             interval_seconds = interval
         else: interval_seconds = 60
@@ -207,7 +204,6 @@ class Period(object):
             rule = rrule.SECONDLY
             step = interval
         dts = rrule.rrule(rule, dtstart=use_start, until=use_end, interval=step)
-        print dts
         return dts
 
     def datetimes_strs(self, start=False, end=False, tzoffset=None):
