@@ -121,14 +121,27 @@ def totals():
 def plotpoints():
     whale = Whale()
     params = default_params()
-    params['depth'] = g('depth', 2)
+    params['depth'] = g('depth', 0)
     params['period'] = g('period', None)
     params['sort'] = g('sort', None)
     params['limit'] = g('limit', 10)
     params['tzoffset'] = g('tzoffset', 0.0)
-    params['flot_time'] = False
+    params['flot_time'] = True
     return whale.plotpoints(**params)
 
+@route('/plotpointsGraph')
+def plotpointsGraph():
+    whale = Whale()
+    params = default_params()
+    params['depth'] = g('depth', 0)
+    params['period'] = g('period', None)
+    params['sort'] = g('sort', None)
+    params['limit'] = g('limit', 10)
+    params['tzoffset'] = g('tzoffset', 0.0)
+    params['flot_time'] = True
+    #print whale.plotpointsGraph(**params)
+    ret = whale.plotpointsGraph(**params)
+    return json.dumps(ret)
 
 @route('/tracker')
 def tracker():

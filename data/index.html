@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body {
+
+
+    font: 10px sans-serif;
+
+
+}
+
+
+.axis path, .axis line {
+
+
+    fill: none;
+
+
+    stroke: #000;
+
+
+    shape-rendering: crispEdges;
+
+
+}
+
+
+.x.axis path {
+
+
+    display: none;
+
+
+}
+
+
+.line {
+
+
+    fill: none;
+
+
+    stroke: steelblue;
+
+
+    stroke-width: 1.5px;
+
+
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+/*var data = [
+    {
+        "dimension": "Indonesia",
+        "Data": [
+            {
+                "Date": "1367605800000",
+                "Value": "63.4"
+            },
+            {
+                "Date": "1397845800000",
+                "Value": "58.0"
+            },
+            {
+                "Date": "1399055400000",
+                "Value": "40.0"
+            }
+        ]
+    },
+    {
+        "dimension": "San Francisco",
+        "Data": [
+            {
+                "Date": "1369420200000",
+                "Value": "62.7"
+            },
+            {
+                "Date": "1378492200000",
+                "Value": "59.9"
+            },
+            {
+                "Date": "1397845800000",
+                "Value": "59.1"
+            }
+        ]
+    },
+    {
+        "dimension": "Austin",
+        "Data": [
+            {
+                "Date": "1382725800000",
+                "Value": "72.2"
+            },
+            {
+                "Date": "1396636200000",
+                "Value": "67.7"
+            },
+            {
+                "Date": "1397845800000",
+                "Value": "69.4"
+            }
+        ]
+    }
+];*/
+
+var margin = {
+    top: 20,
+    right: 80,
+    bottom: 30,
+    left: 50
+},
+width = 360 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var line = d3.svg.line()
+    .interpolate("basis")
+    .x(function (d) {
+    return x(d.Date);
+})
+    .y(function (d) {
+    return y(d.Value);
+});
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.json("data1.json", function(error, data) {
+  color.domain(data.map(function (d) { return d.dimension; }));
+
+  data.forEach(function (kv) {
+      kv.Data.forEach(function (d) {
+          //d.Date = parseDate(d.Date);
+          d.Date = new Date(d.Date*1000);
+      });
+  });
+
+  var dimension = data;
+
+  var minX = d3.min(data, function (kv) { return d3.min(kv.Data, function (d) { return d.Date; }) });
+  var maxX = d3.max(data, function (kv) { return d3.max(kv.Data, function (d) { return d.Date; }) });
+  var minY = d3.min(data, function (kv) { return d3.min(kv.Data, function (d) { return d.Value; }) });
+  var maxY = d3.max(data, function (kv) { return d3.max(kv.Data, function (d) { return d.Value; }) });
+
+  x.domain([minX, maxX]);
+  y.domain([minY, maxY]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Hits");
+
+  var dimension = svg.selectAll(".dimension")
+      .data(dimension)
+      .enter().append("g")
+      .attr("class", "dimension");
+
+  dimension.append("path")
+      .attr("class", "line")
+      .attr("d", function (d) {
+      return line(d.Data);
+  })
+      .style("stroke", function (d) {
+      return color(d.dimension);
+  });
+
+  dimension.append("text")
+      .datum(function (d) {
+      return {
+          name: d.dimension,
+          date: d.Data[d.Data.length - 1].Date,
+          value: d.Data[d.Data.length - 1].Value
+      };
+  })
+      .attr("transform", function (d) {
+      return "translate(" + x(d.date) + "," + y(d.value) + ")";
+  })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .text(function (d) {
+          return d.name;
+  });
+});
+
+</script>
+</body>
+</html>

@@ -149,7 +149,27 @@ class Whale(object):
         return cls._whale_driver
 
     @classmethod
+    def plotpointsGraph(cls, pk, dimensions=None, metrics=None, **kwargs):
+        points = cls.plotpoints(pk, dimensions, metrics, **kwargs)
+        
+        result = []
+        for key in points.keys(): 
+            dim = dict()
+            dim["dimension"] = key
+            dim["Data"] = []
+            dims = dict(points[key]["hits"])
+            for key in dims.keys():
+                val = dict()
+                val["Date"]= key
+                val["Value"] = dims[key]
+                dim["Data"].append(val)
+            result.append(dim)
+        
+        return result
+
+    @classmethod
     # make a combo matrics for scalar and ratio 
+
     def plotpoints(cls, pk, dimensions=None, metrics=None, **kwargs):
         """ Combines scalar_plotpoints and ratio_plotpoints into a single func call w/ formula support """
         combo = defaultdict(dict)
@@ -513,7 +533,7 @@ class Whale(object):
             dimension = [dimension]
         set_members = cls.whale_driver().smembers(keyify('subdimensions', pk,
                     dimension))
-        print keyify('subdimensions', pk, dimension)
+    
         subdimensions = []
         for s in set_members:
             loaded = try_loads(s)
