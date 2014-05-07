@@ -21,9 +21,16 @@ def getplace(lat, lon):
     else:
 		return None, None
 
-filenames = os.listdir(os.getcwd())
-open_files = map(open, filenames)
+
 f = open('data.json','w')
+
+for path, subdirs, files in os.walk(r'C:\Users\user\Desktop\Test_Py'):
+   for filename in files:
+     fp= os.path.join(path, filename)
+
+#filenames = os.listdir(os.getcwd())
+#open_files = map(open, filenames)
+
 # do stuff
 
 #for fp in open_files:
